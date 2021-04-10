@@ -1,42 +1,34 @@
 // Uncaught SyntaxError: Unexpected token '<'
 //server.js
-const express = require('express'),
-      path = require('path'),
-      fs = require('fs'),
-      app = express(),
-      PORT = 3000;
-
-// set server port to either the value defined in PORT, or if that's not set, then 3000
-// app.set('port', process.env.PORT || 3000);
-
-app.use("/assets", express.static('./assets'));
-app.use("/db", express.static('./db'));
+const express = require('express');
+const path = require('path');
+const fs = require('fs');
+const app = express();
+const PORT = process.env.PORT || 3000;
 
 
-// Sets up the Express app to handle data parsing
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.static('public'));
+
 
 // Basic routes
-app.get('/notes', (req,res) => {
-   res.sendFile(path.join(__dirname, '/notes.html'));
-});
+// app.get('/notes', (req,res) => {
+//    res.sendFile(path.join(__dirname, 'notes.html'));
+// });
 
-app.get('/api/nodes', (req,res) => {
-console.log ("api dump here bois");
-});
+// app.get('/api/notes', (req,res) => {
+//    res.sendFile(path.join(__dirname, 'api.html'));
+// });
 
-app.get('*', (req,res) => { 
-   res.sendFile(path.join(__dirname, '/index.html'));
-});
+// app.get('*', (req,res) => { 
+//    res.sendFile(path.join(__dirname, 'index.html'));
+// });
 
-// Express error handling middleware
-// with a '*' route - we shouldn't be hitting this often
-app.use((req,res)=>{
-   res.type('text/plain');
-   res.status(505);
-   res.send('Error page');
-});
+require('./routes/apiRoutes')(app);
+require('./routes/htmlRoutes')(app);
 
 //Binding to a port
-app.listen(PORT, ()=> console.log(`Express server started at port ${PORT}`));
+app.listen(PORT, () => {
+   console.log(`App listening on PORT: ${PORT}`);
+ });

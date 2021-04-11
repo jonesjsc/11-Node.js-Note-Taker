@@ -2,7 +2,7 @@
 // const notesData = require('../db/db.json'); <--- chased this rathole for hours
 const notesDataFile = './db/db.json';
 
-const {v1: uuidv1} = require('uuid');  <--- 
+const {v1: uuidv1} = require('uuid');   
 const util = require('util');
 const fs = require('fs');
 

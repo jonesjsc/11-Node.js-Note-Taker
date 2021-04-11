@@ -20,7 +20,7 @@ This exercise requires the following npm modules
 |Description|Link|
 |-----------|----|
 |github repo|https://github.com/jonesjsc/11-Node.js-Note-Taker|
-|heroku deployment|https://github.com/jonesjsc/11-Node.js-Note-Taker|
+|heroku deployment|https://jej-nodejs-note-taker.herokuapp.com/|
 
 ## How to install
 1. Clone this repo (`gh repo clone jonesjsc/11-Node.js-Note-Taker`)

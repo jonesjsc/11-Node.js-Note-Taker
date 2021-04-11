@@ -5,6 +5,8 @@ const notesDataFile = './db/db.json';
 // console.log("CL "+notesData);
 // console.log("Notes Data File "+notesDataFile);
 
+const {v1: uuidv1} = require('uuid');
+console.log(uuidv1());
 const util = require('util');
 const fs = require('fs');
 
@@ -13,44 +15,44 @@ const fs = require('fs');
 const readFileAsync = util.promisify(fs.readFile);
 const writeFileAsync = util.promisify(fs.writeFile);
 
-class Store {
+// class Store {
 
-  readDataFile (filename) {
-    return readFileAsync(filename, 'utf8');
-  }
+//   readDataFile (filename) {
+//     return readFileAsync(filename, 'utf8');
+//   }
 
-  writeDataFile (filename,notes) {
-    return writeFileAsync (filename, JSON.stringify(notes));
-  }
+//   writeDataFile (filename,notes) {
+//     return writeFileAsync (filename, JSON.stringify(notes));
+//   }
 
-  readNotes () {
-    return this.readDataFile(notesDataFile).then((notes) => {
-      let parsedNotes;
-      try {
-        parsedNotes = [].concat(JSON.parse(notes));
-      } catch (err) {
-        parsedNotes = [];
-      }
-      return parsedNotes;
-    });
-  }
+//   readNotes () {
+//     return this.readDataFile(notesDataFile).then((notes) => {
+//       let parsedNotes;
+//       try {
+//         parsedNotes = [].concat(JSON.parse(notes));
+//       } catch (err) {
+//         parsedNotes = [];
+//       }
+//       return parsedNotes;
+//     });
+//   }
 
-  addNote (note) {
-    const { title, text } = note;
-    if (!title || !text) {
-      throw new Error("Neither Title nor Text can be empty");
-    }
+//   addNote (note) {
+//     const { title, text } = note;
+//     if (!title || !text) {
+//       throw new Error("Neither Title nor Text can be empty");
+//     }
 
-    const newNote = { title, text, id: uuidv1() };
+//     const newNote = { title, text, id: uuidv1() };
 
-    return this.readNotes()
-      .then((notes) => [...notes, newNote])
-      .then((updatedNotes) => this.addNote(updatedNotes))
-      .then(() => newNote);
-  }
-}
+//     return this.readNotes()
+//       .then((notes) => [...notes, newNote])
+//       .then((updatedNotes) => this.addNote(updatedNotes))
+//       .then(() => newNote);
+//   }
+// }
 
-module.exports = new Store();
+// module.exports = new Store();
 module.exports = (app) => {
   // API GET Requests
   // Below code handles when users "visit" a page.

@@ -1,11 +1,8 @@
 // our Notes Database is really just a json file
-// const notesData = require('../db/db.json');
+// const notesData = require('../db/db.json'); <--- chased this rathole for hours
 const notesDataFile = './db/db.json';
-// let notes = [];
-// console.log("CL "+notesData);
-// console.log("Notes Data File "+notesDataFile);
 
-const {v1: uuidv1} = require('uuid');
+const {v1: uuidv1} = require('uuid');  <--- 
 const util = require('util');
 const fs = require('fs');
 
@@ -20,8 +17,6 @@ module.exports = (app) => {
   // In each of the below cases when a user visits a link
   // (ex: localhost:PORT/api/notes... they are shown a JSON of the data in the table)
  
-  // app.get('/api/notes', (req, res) => { res.json(JSON.parse(readFile(notesDataFile, "utf8")))});
-
   app.get('/api/notes', (req, res) => {
     readFile(notesDataFile, 'utf8')
       .then((notesData) => {
@@ -29,7 +24,8 @@ module.exports = (app) => {
       })
   });
 
-    // API POST Requests
+  
+  // API POST Requests
   // Below code handles when a user submits a form and thus submits data to the server.
   // In each of the below cases, when a user submits form data (a JSON object)
   // ...the JSON is pushed to the JSON file
@@ -63,7 +59,5 @@ module.exports = (app) => {
             })   
             
     });
-
-    
 
 };

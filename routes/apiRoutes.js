@@ -1,7 +1,7 @@
 // our Notes Database is really just a json file
 const notesData = require('../db/db.json');
 const notesDataFile = './db/db.json';
-
+// let notes = [];
 // console.log("CL "+notesData);
 // console.log("Notes Data File "+notesDataFile);
 
@@ -13,8 +13,44 @@ const fs = require('fs');
 const readFileAsync = util.promisify(fs.readFile);
 const writeFileAsync = util.promisify(fs.writeFile);
 
-// ROUTING
+class Store {
 
+  readDataFile (filename) {
+    return readFileAsync(filename, 'utf8');
+  }
+
+  writeDataFile (filename,notes) {
+    return writeFileAsync (filename, JSON.stringify(notes));
+  }
+
+  readNotes () {
+    return this.readDataFile(notesDataFile).then((notes) => {
+      let parsedNotes;
+      try {
+        parsedNotes = [].concat(JSON.parse(notes));
+      } catch (err) {
+        parsedNotes = [];
+      }
+      return parsedNotes;
+    });
+  }
+
+  addNote (note) {
+    const { title, text } = note;
+    if (!title || !text) {
+      throw new Error("Neither Title nor Text can be empty");
+    }
+
+    const newNote = { title, text, id: uuidv1() };
+
+    return this.readNotes()
+      .then((notes) => [...notes, newNote])
+      .then((updatedNotes) => this.addNote(updatedNotes))
+      .then(() => newNote);
+  }
+}
+
+module.exports = new Store();
 module.exports = (app) => {
   // API GET Requests
   // Below code handles when users "visit" a page.
@@ -23,21 +59,11 @@ module.exports = (app) => {
   // ---------------------------------------------------------------------------
 
   // app.get('/api/notes', (req, res) => res.json(notesData));
-  app.get('/api/notes', (req, res) => {
-    readFileAsync('./db/db.json', 'utf8')
-    // If promise resolved and datas are read 
-    .then(data => {
-      const contents = data.toString()
-      console.log(`\nContents of the file :\n${contents}`)
-      res.send(contents);
-    })
-  
-    // If promise get rejected
-    .catch(err => {
-      console.log(`Error occurs, Error code -> ${err.code}, 
-      Error No -> ${err.errno}`);
-    });
-  });
+  // app.get('/api/notes', (req, res) => {
+  //   // console.log("answer is "+ans);
+  //   res.send(Store.readNotes);
+  // });
+  app.get('/api/notes', (req, res) => res.json(JSON.parse(fs.readFileSync(notesDataFile, "utf8"))));
 
     // API POST Requests
   // Below code handles when a user submits a form and thus submits data to the server.
@@ -49,7 +75,7 @@ module.exports = (app) => {
     // Note the code here. Our "server" will respond to requests and let users know if they have a table or not.
     // It will do this by sending out the value "true" have a table
     // req.body is available since we're using the body parsing middleware
-   
+    writeFileAsync
     notesData.push(req.body);
     res.json(true);
 

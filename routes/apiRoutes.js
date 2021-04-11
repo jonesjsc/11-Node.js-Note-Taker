@@ -1,71 +1,33 @@
 // our Notes Database is really just a json file
-const notesData = require('../db/db.json');
+// const notesData = require('../db/db.json');
 const notesDataFile = './db/db.json';
 // let notes = [];
 // console.log("CL "+notesData);
 // console.log("Notes Data File "+notesDataFile);
 
 const {v1: uuidv1} = require('uuid');
-console.log(uuidv1());
 const util = require('util');
 const fs = require('fs');
 
 // import { v1 as uuidv1 } from 'uuid'; // Used to generate the Unique ID stored with the note
 
-const readFileAsync = util.promisify(fs.readFile);
-const writeFileAsync = util.promisify(fs.writeFile);
+const readFile = util.promisify(fs.readFile);
+const writeFile = util.promisify(fs.writeFile);
 
-// class Store {
-
-//   readDataFile (filename) {
-//     return readFileAsync(filename, 'utf8');
-//   }
-
-//   writeDataFile (filename,notes) {
-//     return writeFileAsync (filename, JSON.stringify(notes));
-//   }
-
-//   readNotes () {
-//     return this.readDataFile(notesDataFile).then((notes) => {
-//       let parsedNotes;
-//       try {
-//         parsedNotes = [].concat(JSON.parse(notes));
-//       } catch (err) {
-//         parsedNotes = [];
-//       }
-//       return parsedNotes;
-//     });
-//   }
-
-//   addNote (note) {
-//     const { title, text } = note;
-//     if (!title || !text) {
-//       throw new Error("Neither Title nor Text can be empty");
-//     }
-
-//     const newNote = { title, text, id: uuidv1() };
-
-//     return this.readNotes()
-//       .then((notes) => [...notes, newNote])
-//       .then((updatedNotes) => this.addNote(updatedNotes))
-//       .then(() => newNote);
-//   }
-// }
-
-// module.exports = new Store();
 module.exports = (app) => {
   // API GET Requests
   // Below code handles when users "visit" a page.
   // In each of the below cases when a user visits a link
   // (ex: localhost:PORT/api/notes... they are shown a JSON of the data in the table)
-  // ---------------------------------------------------------------------------
+ 
+  // app.get('/api/notes', (req, res) => { res.json(JSON.parse(readFile(notesDataFile, "utf8")))});
 
-  // app.get('/api/notes', (req, res) => res.json(notesData));
-  // app.get('/api/notes', (req, res) => {
-  //   // console.log("answer is "+ans);
-  //   res.send(Store.readNotes);
-  // });
-  app.get('/api/notes', (req, res) => res.json(JSON.parse(fs.readFileSync(notesDataFile, "utf8"))));
+  app.get('/api/notes', (req, res) => {
+    readFile(notesDataFile, 'utf8')
+      .then((notesData) => {
+        res.json(JSON.parse(notesData))
+      })
+  });
 
     // API POST Requests
   // Below code handles when a user submits a form and thus submits data to the server.
@@ -77,32 +39,31 @@ module.exports = (app) => {
     // Note the code here. Our "server" will respond to requests and let users know if they have a table or not.
     // It will do this by sending out the value "true" have a table
     // req.body is available since we're using the body parsing middleware
-    writeFileAsync
-    notesData.push(req.body);
-    res.json(true);
+      readFile(notesDataFile, 'utf8')
+            .then((notesData) => {
+                const notes = JSON.parse(notesData)
+                const newNote = req.body
+                newNote.id = uuidv1();
+                
+                // totally baffled at what is happening here - there are lots of articles on stackoverflow - but
+                // I can't figure out why this notes.push is running twice every time I post a note
+                // so I just put this check in here to keep from pushing blank notes on to the stack.
+                // this is dumb.
 
+                if (typeof newNote.title !== 'undefined') {
+                  notes.push(newNote)
+                }
+                
+                writeFile(notesDataFile, JSON.stringify(notes, null, '\t'))
+                  .then(() => {
+                    res.json(notes)
+                  })
+                
+              
+            })   
+            
     });
 
-    ///-----
-    // if (notesData.length < 5) {
-    //   notesData.push(req.body);
-    //   res.json(true);
-    // } 
-    // else {
-    //   wai
-    //   tListData.push(req.body);
-    //   res.json(false);
-    // }
-  // });
+    
 
-  // I added this below code so you could clear out the table while working with the functionality.
-  // Don"t worry about it!
-
-  app.post('/api/clear', (req, res) => {
-    // Empty out the arrays of data
-    tableData.length = 0;
-    waitListData.length = 0;
-
-    res.json({ ok: true });
-  });
 };
